@@ -253,14 +253,14 @@ class Garden:
 
         # Spawn new snails
         if current_time - self.last_snail_spawn > spawn_interval:
-            # Find ripe vegetables
-            ripe_vegetables = [v for v in self.vegetables if v.grown and not v.plant_dead]
-            if ripe_vegetables:
+            # Find all living vegetables (both ripe and unripe)
+            living_vegetables = [v for v in self.vegetables if not v.plant_dead]
+            if living_vegetables:
                 # In rain, spawn multiple snails at once
                 snail_count = random.randint(2, 4) if current_weather == 'rainy' else 1
                 for _ in range(snail_count):
-                    if ripe_vegetables:  # Check again in case we run out
-                        target = random.choice(ripe_vegetables)
+                    if living_vegetables:  # Check again in case we run out
+                        target = random.choice(living_vegetables)
                         self.snails.append(Snail(target))
                 self.last_snail_spawn = current_time
 
@@ -268,10 +268,9 @@ class Garden:
         for snail in self.snails[:]:
             finished = snail.update(delta_time)
             if finished:
-                # Snail finished eating - kill the plant
-                if snail.target.grown:
-                    snail.target.grown = False
-                    snail.target.plant_dead = True
+                # Snail finished eating - kill the plant (both ripe and unripe)
+                snail.target.grown = False
+                snail.target.plant_dead = True
                 self.snails.remove(snail)
 
     def _update_weed_pickers(self):
