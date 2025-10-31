@@ -1,0 +1,23 @@
+{
+  "name": "garden-game-web",
+  "version": "1.0.0",
+  "description": "Web version of the garden game",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "source venv/bin/activate && pygbag main.py",
+    "dev": "source venv/bin/activate && pygbag main.py && cd build/web && python -m http.server 8000",
+    "serve": "pkill -f 'python -m http.server' || true && cd build/web && python -m http.server 8000",
+    "clean": "rm -rf build/"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "babel-loader": "^9.1.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "webpack-dev-server": "^4.15.0"
+  },
+  "dependencies": {}
+}
