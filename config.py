@@ -39,6 +39,8 @@ SHOP_PRICES = {
     'eggplant_seeds': 20,
     'sprinkler_system': 100,
     'weed_killer': 25,
+    'weed_picker': 10,
+    'duck': 15,
     'fertilizer': 10,
     'water': 1
 }
@@ -194,6 +196,8 @@ SHOP_ITEMS = [
     ('Auberginen-Samen', 'eggplant_seeds', 20),
     ('Sprinkleranlage', 'sprinkler_system', 100),
     ('Unkrautkiller', 'weed_killer', 25),
+    ('Unkrautpflücker (2min)', 'weed_picker', 10),
+    ('Ente 🦆 (2min)', 'duck', 15),
     ('Dünger', 'fertilizer', 10),
     ('Wasser', 'water', 1)
 ]

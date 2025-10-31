@@ -57,6 +57,9 @@ class Shop:
             credits -= price
             if item == 'sprinkler_system':
                 inventory.set_sprinkler(True)
+            elif item == 'weed_picker' or item == 'duck':
+                # Weed picker and duck are used immediately, not stored in inventory
+                pass
             else:
                 inventory.add_item(item, 1)
             return f"{item.replace('_', ' ').title()} gekauft für {price} Credits!", credits

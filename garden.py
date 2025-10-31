@@ -11,6 +11,8 @@ from weather import WeatherSystem
 from effects import VisualEffects, SprinklerSystem
 from sound_manager import SoundManager
 from snail import Snail
+from weed_picker import WeedPicker
+from duck import Duck
 from config import (
     INITIAL_CREDITS, GARDEN_ROWS, GARDEN_COLS,
     GARDEN_START_X, GARDEN_START_Y, GARDEN_SPACING_X, GARDEN_SPACING_Y,
@@ -44,6 +46,12 @@ class Garden:
         self.snails = []
         self.last_snail_spawn = time.time()
         self.snail_spawn_interval = 15.0  # Spawn snail every 15 seconds
+
+        # Weed picker system
+        self.weed_pickers = []
+
+        # Duck system
+        self.ducks = []
 
         # Initialize garden plots
         self._initialize_plots()
@@ -91,6 +99,12 @@ class Garden:
         # Update snails
         self._update_snails()
 
+        # Update weed pickers
+        self._update_weed_pickers()
+
+        # Update ducks
+        self._update_ducks()
+
     def update_hover(self, mouse_pos):
         """Update hover state"""
         self.effects.update_hover(mouse_pos, self.vegetables)
@@ -130,6 +144,12 @@ class Garden:
                     self.sound.play('buy')
                     if "Sprinkleranlage" in message:
                         self.sprinkler.activate()
+                    elif "Weed Picker" in message or "Unkrautpflücker" in message:
+                        # Spawn a weed picker
+                        self.weed_pickers.append(WeedPicker(self.vegetables))
+                    elif "Duck" in message or "Ente" in message:
+                        # Spawn a duck
+                        self.ducks.append(Duck(self.snails))
                 else:
                     self.sound.play('error')
                 self.credits = new_credits
@@ -223,14 +243,25 @@ class Garden:
         """Update snail spawning and movement"""
         current_time = time.time()
         delta_time = 1.0 / 60.0  # Approximate delta time
+        current_weather = self.weather.get_weather()
+
+        # Adjust spawn interval based on weather
+        if current_weather == 'rainy':
+            spawn_interval = 5.0  # Much faster spawning in rain (every 5 seconds)
+        else:
+            spawn_interval = self.snail_spawn_interval  # Normal 15 seconds
 
         # Spawn new snails
-        if current_time - self.last_snail_spawn > self.snail_spawn_interval:
+        if current_time - self.last_snail_spawn > spawn_interval:
             # Find ripe vegetables
             ripe_vegetables = [v for v in self.vegetables if v.grown and not v.plant_dead]
             if ripe_vegetables:
-                target = random.choice(ripe_vegetables)
-                self.snails.append(Snail(target))
+                # In rain, spawn multiple snails at once
+                snail_count = random.randint(2, 4) if current_weather == 'rainy' else 1
+                for _ in range(snail_count):
+                    if ripe_vegetables:  # Check again in case we run out
+                        target = random.choice(ripe_vegetables)
+                        self.snails.append(Snail(target))
                 self.last_snail_spawn = current_time
 
         # Update existing snails
@@ -242,6 +273,26 @@ class Garden:
                     snail.target.grown = False
                     snail.target.plant_dead = True
                 self.snails.remove(snail)
+
+    def _update_weed_pickers(self):
+        """Update weed picker movement and working"""
+        delta_time = 1.0 / 60.0  # Approximate delta time
+
+        for picker in self.weed_pickers[:]:
+            finished = picker.update(delta_time)
+            if finished:
+                # Picker's time is up
+                self.weed_pickers.remove(picker)
+
+    def _update_ducks(self):
+        """Update duck movement and snail eating"""
+        delta_time = 1.0 / 60.0  # Approximate delta time
+
+        for duck in self.ducks[:]:
+            finished = duck.update(delta_time)
+            if finished:
+                # Duck's time is up
+                self.ducks.remove(duck)
 
     def _default_action(self, vegetable):
         """Perform default action on vegetable plot (no tool selected)"""
@@ -322,6 +373,14 @@ class Garden:
         # Draw snails
         for snail in self.snails:
             snail.draw(screen)
+
+        # Draw weed pickers
+        for picker in self.weed_pickers:
+            picker.draw(screen)
+
+        # Draw ducks
+        for duck in self.ducks:
+            duck.draw(screen)
 
         # Draw sprinkler system
         self.sprinkler.draw(screen, self.vegetables)
