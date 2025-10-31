@@ -69,6 +69,12 @@ WEED_SPAWN_CHANCE = 0.3
 WEED_GROWTH_TIME = 10
 MAX_WEED_LEVEL = 10
 
+# Snail settings (Schnecken)
+SNAIL_CHECK_INTERVAL = 10.0  # Check every 10 seconds for snail spawn
+SNAIL_SPAWN_CHANCE = 0.25     # 25% chance to spawn on ripe vegetables
+SNAIL_EATING_TIME = 20.0      # Time in seconds until vegetable is eaten
+MAX_SNAILS_PER_PLANT = 3      # Maximum snails on one plant
+
 # Weather settings
 MIN_WEATHER_DURATION = 20
 MAX_WEATHER_DURATION = 45
@@ -122,7 +128,7 @@ SOUND_FILES = {
     'birds': 'sounds/birds.ogg'
 }
 
-BACKGROUND_MUSIC = 'sounds/bgm.ogg'
+BACKGROUND_MUSIC = 'sounds/forest_of_hope.mp3'
 DEFAULT_VOLUME = 0.7
 MUSIC_VOLUME_MULTIPLIER = 0.5
 AMBIENT_VOLUME_MULTIPLIER = 0.3
@@ -154,6 +160,11 @@ MUTE_BUTTON_X = 600
 MUTE_BUTTON_Y = 330
 MUTE_BUTTON_WIDTH = 180
 MUTE_BUTTON_HEIGHT = 35
+
+MUSIC_BUTTON_X = 600
+MUSIC_BUTTON_Y = 375
+MUSIC_BUTTON_WIDTH = 180
+MUSIC_BUTTON_HEIGHT = 35
 
 # Inventory button layout
 INVENTORY_BUTTONS = [

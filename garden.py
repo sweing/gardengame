@@ -93,6 +93,13 @@ class Garden:
             self.sound.toggle_mute()
             return "Sound " + ("ausgeschaltet" if self.sound.muted else "eingeschaltet")
 
+        # Check music button
+        from config import MUSIC_BUTTON_X, MUSIC_BUTTON_Y, MUSIC_BUTTON_WIDTH, MUSIC_BUTTON_HEIGHT
+        music_rect = pygame.Rect(MUSIC_BUTTON_X, MUSIC_BUTTON_Y, MUSIC_BUTTON_WIDTH, MUSIC_BUTTON_HEIGHT)
+        if music_rect.collidepoint(mouse_pos) and not right_click:
+            self.sound.toggle_music()
+            return "Musik " + ("ausgeschaltet" if not self.sound.music_playing else "eingeschaltet")
+
         # Check inventory buttons
         inventory_msg = self.inventory.handle_click(mouse_pos)
         if inventory_msg and not right_click:
@@ -197,16 +204,27 @@ class Garden:
 
     def _default_action(self, vegetable):
         """Perform default action on vegetable plot (no tool selected)"""
-        if vegetable.weed_level > 0:
+        # Priority 1: Remove snails (highest priority on ripe plants)
+        if vegetable.snail_count > 0 and vegetable.grown:
+            vegetable.remove_snails()
+            self.sound.play('weed')  # Use weed sound for snail removal
+            if vegetable.snail_count > 0:
+                return f"Schnecke entfernt! Noch {vegetable.snail_count} übrig"
+            else:
+                return "Alle Schnecken entfernt!"
+        # Priority 2: Remove weeds
+        elif vegetable.weed_level > 0:
             vegetable.remove_weeds()
             self.sound.play('weed')
             if vegetable.weed_level > 0:
                 return f"Unkraut reduziert! Level {vegetable.weed_level} ({vegetable.weed_level} Klicks nötig)"
             else:
                 return "Unkraut komplett entfernt!"
+        # Priority 3: Dead plants
         elif vegetable.plant_dead:
             self.sound.play('error')
             return "Totes Feld - kaufe Samen im Shop zum Pflanzen!"
+        # Priority 4: Harvest
         else:
             earned = vegetable.harvest()
             if earned > 0:
@@ -244,6 +262,9 @@ class Garden:
 
         # Draw mute button
         self._draw_mute_button(screen, font)
+
+        # Draw music button
+        self._draw_music_button(screen, font)
 
         # Draw selected vegetable highlight
         if self.selected_vegetable:
@@ -291,3 +312,13 @@ class Garden:
         pygame.draw.rect(screen, BLACK, mute_button, 2)
         mute_text = font.render("🔇 Muted" if self.sound.muted else "🔊 Sound ON", True, BLACK)
         screen.blit(mute_text, (MUTE_BUTTON_X + 30, MUTE_BUTTON_Y + 8))
+
+    def _draw_music_button(self, screen, font):
+        """Draw the music toggle button"""
+        from config import MUSIC_BUTTON_X, MUSIC_BUTTON_Y, MUSIC_BUTTON_WIDTH, MUSIC_BUTTON_HEIGHT
+        music_button = pygame.Rect(MUSIC_BUTTON_X, MUSIC_BUTTON_Y, MUSIC_BUTTON_WIDTH, MUSIC_BUTTON_HEIGHT)
+        music_color = CONFIG_RED if not self.sound.music_playing else CONFIG_GREEN
+        pygame.draw.rect(screen, music_color, music_button)
+        pygame.draw.rect(screen, BLACK, music_button, 2)
+        music_text = font.render("🎵 Musik AUS" if not self.sound.music_playing else "🎵 Musik AN", True, BLACK)
+        screen.blit(music_text, (MUSIC_BUTTON_X + 30, MUSIC_BUTTON_Y + 8))

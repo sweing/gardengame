@@ -62,6 +62,16 @@ class SoundManager:
         pygame.mixer.music.stop()
         self.music_playing = False
 
+    def toggle_music(self):
+        """Toggle background music on/off"""
+        if self.music_playing:
+            pygame.mixer.music.pause()
+            self.music_playing = False
+        else:
+            pygame.mixer.music.unpause()
+            self.music_playing = True
+        return self.music_playing
+
     def toggle_mute(self):
         """Toggle sound on/off"""
         self.muted = not self.muted
