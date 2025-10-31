@@ -22,10 +22,21 @@ class Shop:
         return self.show
 
     def handle_click(self, mouse_pos, inventory, credits):
-        """Handle shop item purchases"""
+        """Handle shop item purchases and close button"""
         if not self.show:
             return None, credits
 
+        # Check close button (X)
+        close_button_size = 30
+        close_button_x = SHOP_X + SHOP_WIDTH - close_button_size - 5
+        close_button_y = SHOP_Y + 5
+        close_button_rect = pygame.Rect(close_button_x, close_button_y, close_button_size, close_button_size)
+
+        if close_button_rect.collidepoint(mouse_pos):
+            self.show = False
+            return "Shop geschlossen!", credits
+
+        # Check shop items
         for display_name, item_key, price in SHOP_ITEMS:
             y_pos = SHOP_ITEM_START_Y + SHOP_ITEMS.index((display_name, item_key, price)) * SHOP_ITEM_SPACING
             button_rect = pygame.Rect(SHOP_X + 10, y_pos, SHOP_WIDTH - 20, SHOP_ITEM_HEIGHT)
@@ -61,6 +72,19 @@ class Shop:
         shop_bg = pygame.Rect(SHOP_X, SHOP_Y, SHOP_WIDTH, SHOP_HEIGHT)
         pygame.draw.rect(screen, WHITE, shop_bg)
         pygame.draw.rect(screen, BLACK, shop_bg, 3)
+
+        # Draw close button (X) in top-right corner
+        close_button_size = 30
+        close_button_x = SHOP_X + SHOP_WIDTH - close_button_size - 5
+        close_button_y = SHOP_Y + 5
+        close_button_rect = pygame.Rect(close_button_x, close_button_y, close_button_size, close_button_size)
+        pygame.draw.rect(screen, RED, close_button_rect)
+        pygame.draw.rect(screen, BLACK, close_button_rect, 2)
+
+        # Draw X
+        x_font = pygame.font.Font(None, 28)
+        x_text = x_font.render("X", True, WHITE)
+        screen.blit(x_text, (close_button_x + 8, close_button_y + 4))
 
         # Draw title
         title_text = font.render("SHOP", True, BLACK)

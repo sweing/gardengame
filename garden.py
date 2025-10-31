@@ -149,8 +149,8 @@ class Garden:
                 self.inventory.clear_active_tool()
                 return f"Gedüngt! ({self.inventory.get_item_count('fertilizer')} übrig)"
             else:
-                self.sound.play('error')
-                return "Kein Dünger vorhanden!"
+                self.inventory.clear_active_tool()
+                return self._default_action(vegetable)
 
         elif tool == 'water':
             if self.inventory.get_item_count('water') > 0:
@@ -162,8 +162,8 @@ class Garden:
                 self.inventory.clear_active_tool()
                 return f"Gegossen! ({self.inventory.get_item_count('water')} übrig)"
             else:
-                self.sound.play('error')
-                return "Kein Wasser vorhanden!"
+                self.inventory.clear_active_tool()
+                return self._default_action(vegetable)
 
         elif tool == 'weed_killer':
             if self.inventory.get_item_count('weed_killer') > 0 and vegetable.weed_level > 0:
@@ -173,17 +173,14 @@ class Garden:
                 self.sound.play('weed')
                 self.inventory.clear_active_tool()
                 return f"Unkraut entfernt! ({self.inventory.get_item_count('weed_killer')} übrig)"
-            elif vegetable.weed_level == 0:
-                self.sound.play('error')
-                return "Kein Unkraut auf diesem Feld!"
             else:
-                self.sound.play('error')
-                return "Kein Unkrautkiller vorhanden!"
+                self.inventory.clear_active_tool()
+                return self._default_action(vegetable)
 
         elif tool in ['tomato_seeds', 'carrot_seeds', 'eggplant_seeds']:
             if vegetable.weed_level > 0:
-                self.sound.play('error')
-                return "Unkraut muss zuerst entfernt werden!"
+                self.inventory.clear_active_tool()
+                return self._default_action(vegetable)
             elif self.inventory.get_item_count(tool) > 0 and vegetable.plant_dead:
                 self.inventory.remove_item(tool)
                 seed_type = tool.replace('_seeds', '')
@@ -192,12 +189,9 @@ class Garden:
                 self.inventory.clear_active_tool()
                 remaining = self.inventory.get_item_count(tool)
                 return f"{seed_type.title()}-Samen gepflanzt! ({remaining} übrig)"
-            elif not vegetable.plant_dead:
-                self.sound.play('error')
-                return "Feld ist nicht tot - kann nicht pflanzen!"
             else:
-                self.sound.play('error')
-                return f"Keine {tool.replace('_', ' ')} vorhanden!"
+                self.inventory.clear_active_tool()
+                return self._default_action(vegetable)
 
         return ""
 
