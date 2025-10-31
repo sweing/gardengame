@@ -11,7 +11,6 @@ from config import (
     BASE_MOISTURE_LOSS_RATE, MOISTURE_LOSS_SUNNY, MOISTURE_LOSS_RAINY, MOISTURE_LOSS_CLOUDY,
     RAIN_MOISTURE_GAIN, WATER_INCREASE_AMOUNT,
     WEED_CHECK_INTERVAL, WEED_SPAWN_CHANCE, WEED_GROWTH_TIME, MAX_WEED_LEVEL,
-    SNAIL_CHECK_INTERVAL, SNAIL_SPAWN_CHANCE, SNAIL_EATING_TIME, MAX_SNAILS_PER_PLANT,
     REVIVAL_MIN_FERTILITY, REVIVAL_MIN_MOISTURE,
     SEED_PLANT_FERTILITY, SEED_PLANT_MOISTURE,
     WATER_PARTICLE_COUNT, FERTILIZER_PARTICLE_COUNT, WEED_PARTICLE_COUNT,
@@ -40,11 +39,6 @@ class Vegetable:
         self.weed_particles = []
         self.seed_particles = []
         self.fertilizer_particles = []
-
-        # Snail system
-        self.snail_count = 0
-        self.snail_eating_start = None
-        self.last_snail_check = time.time()
 
         self.colors = VEGETABLE_COLORS
         self.credits = VEGETABLE_CREDITS
@@ -92,19 +86,6 @@ class Vegetable:
                 color = weed_colors[i % len(weed_colors)]
                 pygame.draw.line(screen, color, (weed_x, weed_y + weed_height), (weed_x, weed_y), weed_thickness)
                 pygame.draw.circle(screen, color, (weed_x, weed_y), 2 + self.weed_level)
-
-        # Draw snails (Schnecken)
-        if self.snail_count > 0 and self.grown:
-            for i in range(self.snail_count):
-                # Position snails around the plant
-                snail_x = self.x + 10 + (i * 20)
-                snail_y = self.y + 45
-
-                # Draw snail body (brown oval)
-                pygame.draw.ellipse(screen, (139, 90, 43), (snail_x, snail_y, 12, 8))
-                # Draw snail shell (spiral-ish circle)
-                pygame.draw.circle(screen, (101, 67, 33), (snail_x + 8, snail_y + 2), 5)
-                pygame.draw.circle(screen, (139, 90, 43), (snail_x + 8, snail_y + 2), 3)
 
         # Draw particle animations
         self._draw_particles(screen)
@@ -189,9 +170,6 @@ class Vegetable:
         # Update weeds
         self._update_weeds(current_time)
 
-        # Update snails
-        self._update_snails(current_time)
-
         # Check for plant death
         if self.soil_fertility <= 0 or self.soil_moisture <= 0:
             self.plant_dead = True
@@ -250,37 +228,12 @@ class Vegetable:
                 self.weed_level = min(MAX_WEED_LEVEL, self.weed_level + 1)
                 self.weed_start_time = current_time
 
-    def _update_snails(self, current_time):
-        """Update snail spawning and eating"""
-        # Check for snail spawn on ripe vegetables
-        if current_time - self.last_snail_check > SNAIL_CHECK_INTERVAL:
-            if self.grown and not self.plant_dead and self.snail_count < MAX_SNAILS_PER_PLANT:
-                if random.random() < SNAIL_SPAWN_CHANCE:
-                    self.snail_count += 1
-                    if self.snail_count == 1:
-                        self.snail_eating_start = current_time
-            self.last_snail_check = current_time
-
-        # Snails eat the plant over time
-        if self.snail_count > 0 and self.snail_eating_start:
-            eating_time = current_time - self.snail_eating_start
-            if eating_time >= SNAIL_EATING_TIME:
-                # Plant is completely eaten!
-                self.grown = False
-                self.plant_dead = True
-                self.snail_count = 0
-                self.snail_eating_start = None
-
     def harvest(self):
         """Harvest the vegetable"""
         if self.grown:
             self.grown = False
             self.harvest_count += 1
             self.soil_fertility = max(MIN_FERTILITY, self.soil_fertility - FERTILITY_LOSS_PER_HARVEST)
-
-            # Clear snails when harvesting
-            self.snail_count = 0
-            self.snail_eating_start = None
 
             base_time = random.uniform(MIN_REGROW_TIME, MAX_REGROW_TIME)
             fertility_modifier = 1 + (1 - self.soil_fertility) * 2
@@ -290,15 +243,6 @@ class Vegetable:
 
             return self.credits[self.type]
         return 0
-
-    def remove_snails(self):
-        """Remove one snail from the plant"""
-        if self.snail_count > 0:
-            self.snail_count -= 1
-            if self.snail_count == 0:
-                self.snail_eating_start = None
-            return True
-        return False
 
     def fertilize(self):
         """Apply fertilizer to the plot"""

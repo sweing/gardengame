@@ -3,12 +3,14 @@ Main garden game logic
 """
 import pygame
 import time
+import random
 from vegetable import Vegetable
 from inventory import Inventory
 from shop import Shop
 from weather import WeatherSystem
 from effects import VisualEffects, SprinklerSystem
 from sound_manager import SoundManager
+from snail import Snail
 from config import (
     INITIAL_CREDITS, GARDEN_ROWS, GARDEN_COLS,
     GARDEN_START_X, GARDEN_START_Y, GARDEN_SPACING_X, GARDEN_SPACING_Y,
@@ -37,6 +39,11 @@ class Garden:
 
         # Start background music
         self.sound.play_music()
+
+        # Snail system
+        self.snails = []
+        self.last_snail_spawn = time.time()
+        self.snail_spawn_interval = 15.0  # Spawn snail every 15 seconds
 
         # Initialize garden plots
         self._initialize_plots()
@@ -81,6 +88,9 @@ class Garden:
         # Update visual effects
         self.effects.update()
 
+        # Update snails
+        self._update_snails()
+
     def update_hover(self, mouse_pos):
         """Update hover state"""
         self.effects.update_hover(mouse_pos, self.vegetables)
@@ -124,6 +134,13 @@ class Garden:
                     self.sound.play('error')
                 self.credits = new_credits
                 return message
+
+        # Check snail clicks first
+        for snail in self.snails[:]:
+            if snail.is_clicked(mouse_pos) and not right_click:
+                self.snails.remove(snail)
+                self.sound.play('weed')
+                return "Schnecke entfernt!"
 
         # Handle vegetable interactions
         for vegetable in self.vegetables:
@@ -202,18 +219,34 @@ class Garden:
 
         return ""
 
+    def _update_snails(self):
+        """Update snail spawning and movement"""
+        current_time = time.time()
+        delta_time = 1.0 / 60.0  # Approximate delta time
+
+        # Spawn new snails
+        if current_time - self.last_snail_spawn > self.snail_spawn_interval:
+            # Find ripe vegetables
+            ripe_vegetables = [v for v in self.vegetables if v.grown and not v.plant_dead]
+            if ripe_vegetables:
+                target = random.choice(ripe_vegetables)
+                self.snails.append(Snail(target))
+                self.last_snail_spawn = current_time
+
+        # Update existing snails
+        for snail in self.snails[:]:
+            finished = snail.update(delta_time)
+            if finished:
+                # Snail finished eating - kill the plant
+                if snail.target.grown:
+                    snail.target.grown = False
+                    snail.target.plant_dead = True
+                self.snails.remove(snail)
+
     def _default_action(self, vegetable):
         """Perform default action on vegetable plot (no tool selected)"""
-        # Priority 1: Remove snails (highest priority on ripe plants)
-        if vegetable.snail_count > 0 and vegetable.grown:
-            vegetable.remove_snails()
-            self.sound.play('weed')  # Use weed sound for snail removal
-            if vegetable.snail_count > 0:
-                return f"Schnecke entfernt! Noch {vegetable.snail_count} übrig"
-            else:
-                return "Alle Schnecken entfernt!"
-        # Priority 2: Remove weeds
-        elif vegetable.weed_level > 0:
+        # Priority 1: Remove weeds
+        if vegetable.weed_level > 0:
             vegetable.remove_weeds()
             self.sound.play('weed')
             if vegetable.weed_level > 0:
@@ -285,6 +318,10 @@ class Garden:
             vegetable.draw(screen, font)
             self.effects.draw_hover_effect(screen, font)
             self.effects.draw_growth_progress(screen, vegetable)
+
+        # Draw snails
+        for snail in self.snails:
+            snail.draw(screen)
 
         # Draw sprinkler system
         self.sprinkler.draw(screen, self.vegetables)
