@@ -146,7 +146,8 @@ class Garden:
                         self.sprinkler.activate()
                     elif "Weed Picker" in message or "Unkrautpflücker" in message:
                         # Spawn a weed picker
-                        self.weed_pickers.append(WeedPicker(self.vegetables))
+                        current_weather = self.weather.get_weather()
+                        self.weed_pickers.append(WeedPicker(self.vegetables, current_weather))
                     elif "Duck" in message or "Ente" in message:
                         # Spawn a duck
                         self.ducks.append(Duck(self.snails))
@@ -276,8 +277,11 @@ class Garden:
     def _update_weed_pickers(self):
         """Update weed picker movement and working"""
         delta_time = 1.0 / 60.0  # Approximate delta time
+        current_weather = self.weather.get_weather()
 
         for picker in self.weed_pickers[:]:
+            # Update weather for umbrella display
+            picker.update_weather(current_weather)
             finished = picker.update(delta_time)
             if finished:
                 # Picker's time is up

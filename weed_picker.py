@@ -10,9 +10,10 @@ import time
 class WeedPicker:
     """A helper that walks between garden plots removing weeds"""
 
-    def __init__(self, vegetables):
+    def __init__(self, vegetables, weather='sunny'):
         self.vegetables = vegetables
         self.size = 25
+        self.weather = weather
 
         # Start at a random position near the garden
         self.x = random.randint(150, 600)
@@ -104,6 +105,10 @@ class WeedPicker:
 
         return False
 
+    def update_weather(self, weather):
+        """Update weather state"""
+        self.weather = weather
+
     def draw(self, screen):
         """Draw the weed picker with walking animation"""
         x, y = int(self.x), int(self.y)
@@ -158,6 +163,33 @@ class WeedPicker:
         # Border
         pygame.draw.rect(screen, (0, 0, 0), (bar_x, bar_y, bar_width, bar_height), 1)
 
+        # Draw umbrella if raining
+        if self.weather == 'rainy':
+            umbrella_x = x
+            umbrella_y = y - 25 + bob_offset
+
+            # Umbrella stick
+            pygame.draw.line(screen, (139, 69, 19), (umbrella_x, umbrella_y),
+                           (umbrella_x, y - 10 + bob_offset), 2)
+
+            # Umbrella canopy (arc)
+            umbrella_radius = 15
+            # Draw semi-circle for umbrella top
+            for i in range(-umbrella_radius, umbrella_radius + 1):
+                height = int(math.sqrt(max(0, umbrella_radius**2 - i**2)))
+                pygame.draw.line(screen, (200, 50, 50),
+                               (umbrella_x + i, umbrella_y - height),
+                               (umbrella_x + i, umbrella_y), 1)
+
+            # Umbrella outline
+            pygame.draw.arc(screen, (150, 30, 30),
+                          (umbrella_x - umbrella_radius, umbrella_y - umbrella_radius,
+                           umbrella_radius * 2, umbrella_radius * 2),
+                          0, math.pi, 2)
+
+            # Umbrella handle
+            pygame.draw.circle(screen, (139, 69, 19), (umbrella_x, y - 10 + bob_offset), 2)
+
         # Draw working indicator
         if self.working:
-            pygame.draw.circle(screen, (255, 255, 0), (x, y - 20), 4)
+            pygame.draw.circle(screen, (255, 255, 0), (x, y - 20 + bob_offset), 4)
