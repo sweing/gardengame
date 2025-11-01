@@ -13,6 +13,7 @@ from sound_manager import SoundManager
 from snail import Snail
 from weed_picker import WeedPicker
 from duck import Duck
+from storage_house import StorageHouse
 from config import (
     INITIAL_CREDITS, GARDEN_ROWS, GARDEN_COLS,
     GARDEN_START_X, GARDEN_START_Y, GARDEN_SPACING_X, GARDEN_SPACING_Y,
@@ -52,6 +53,9 @@ class Garden:
 
         # Duck system
         self.ducks = []
+
+        # Storage house (positioned in top-left area)
+        self.storage_house = StorageHouse(20, 100)
 
         # Initialize garden plots
         self._initialize_plots()
@@ -105,12 +109,19 @@ class Garden:
         # Update ducks
         self._update_ducks()
 
+        # Update storage house
+        self.storage_house.update()
+
     def update_hover(self, mouse_pos):
         """Update hover state"""
         self.effects.update_hover(mouse_pos, self.vegetables)
 
     def handle_click(self, mouse_pos, right_click=False):
         """Handle mouse clicks"""
+        # Check storage house
+        if self.storage_house.is_clicked(mouse_pos) and not right_click:
+            return "Lagerhäuschen - Hier wird dein Inventar aufbewahrt!"
+
         # Check mute button
         mute_rect = pygame.Rect(MUTE_BUTTON_X, MUTE_BUTTON_Y, MUTE_BUTTON_WIDTH, MUTE_BUTTON_HEIGHT)
         if mute_rect.collidepoint(mouse_pos) and not right_click:
@@ -331,6 +342,9 @@ class Garden:
         title = title_font.render("Garten-Spiel", True, BLACK)
         from config import WINDOW_WIDTH
         screen.blit(title, (WINDOW_WIDTH // 2 - title.get_width() // 2, 20))
+
+        # Draw storage house (before other UI elements)
+        self.storage_house.draw(screen)
 
         # Draw credits
         credits_text = font.render(f"Credits: {self.credits}", True, BLACK)
