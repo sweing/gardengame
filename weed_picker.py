@@ -23,7 +23,7 @@ class WeedPicker:
         self.target_plot = None
         self.working = False
         self.work_start_time = None
-        self.work_duration = 1.5  # 1.5 seconds to remove weed level
+        self.work_duration = 0.5  # 0.5 seconds to remove weed level (faster!)
 
         # Duration: 2 minutes (120 seconds)
         self.spawn_time = time.time()
