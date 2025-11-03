@@ -70,3 +70,31 @@ class WeatherSystem:
     def get_weather(self):
         """Get current weather"""
         return self.weather
+
+    def get_forecast(self, periods=3):
+        """Get weather forecast for next periods
+
+        Returns list of weather predictions:
+        [current, next, after_next]
+        """
+        forecast = [self.weather]  # Current weather
+
+        # Calculate remaining time for current weather
+        current_time = time.time()
+        time_elapsed = current_time - self.last_weather_change
+        time_remaining = self.weather_duration - time_elapsed
+
+        # Seed random with current weather state for consistent predictions
+        seed = int((self.last_weather_change + self.weather_duration) * 1000)
+
+        # Predict next weather periods
+        for i in range(1, periods):
+            # Use seeded random for consistent forecast
+            random.seed(seed + i)
+            next_weather = random.choice(WEATHER_OPTIONS)
+            forecast.append(next_weather)
+
+        # Reset random seed
+        random.seed()
+
+        return forecast

@@ -56,6 +56,10 @@ class Shop:
         if item == 'rain_barrel' and inventory.has_rain_barrel():
             return "Regentonne bereits gekauft!", credits
 
+        # Check if weather TV already owned
+        if item == 'weather_tv' and inventory.has_weather_tv():
+            return "Wetter-TV bereits gekauft!", credits
+
         # Check if enough credits
         if credits >= price:
             credits -= price
@@ -63,6 +67,8 @@ class Shop:
                 inventory.set_sprinkler(True)
             elif item == 'rain_barrel':
                 inventory.set_rain_barrel(True)
+            elif item == 'weather_tv':
+                inventory.set_weather_tv(True)
             elif item == 'weed_picker' or item == 'duck':
                 # Weed picker and duck are used immediately, not stored in inventory
                 pass
@@ -114,6 +120,11 @@ class Shop:
                 color = GRAY
                 display_name += " (Gekauft)"
 
+            # Gray out weather TV if already owned
+            if item_key == 'weather_tv' and inventory.has_weather_tv():
+                color = GRAY
+                display_name += " (Gekauft)"
+
             button_rect = pygame.Rect(SHOP_X + 10, y_offset, SHOP_WIDTH - 20, SHOP_ITEM_HEIGHT)
             pygame.draw.rect(screen, color, button_rect)
             pygame.draw.rect(screen, BLACK, button_rect, 1)
@@ -122,7 +133,7 @@ class Shop:
             screen.blit(item_text, (SHOP_X + 15, y_offset + 5))
 
             # Show inventory count
-            if item_key != 'sprinkler_system' and item_key != 'rain_barrel':
+            if item_key not in ['sprinkler_system', 'rain_barrel', 'weather_tv']:
                 count = inventory.get_item_count(item_key)
                 if count > 0:
                     count_text = font.render(f"({count})", True, BLACK)
@@ -141,6 +152,12 @@ class Shop:
         if inventory.has_rain_barrel():
             barrel_text = font.render("Regentonne aktiv!", True, GREEN)
             screen.blit(barrel_text, (SHOP_X + 65, status_y))
+            status_y += 20
+
+        # Show weather TV status
+        if inventory.has_weather_tv():
+            tv_text = font.render("Wetter-TV aktiv!", True, GREEN)
+            screen.blit(tv_text, (SHOP_X + 65, status_y))
 
     def draw_button(self, screen, font):
         """Draw the shop toggle button"""

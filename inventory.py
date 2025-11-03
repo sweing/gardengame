@@ -18,6 +18,7 @@ class Inventory:
             'eggplant_seeds': 0,
             'sprinkler_system': False,
             'rain_barrel': False,
+            'weather_tv': False,
             'weed_killer': 0,
             'fertilizer': 0,
             'water': 0
@@ -60,6 +61,14 @@ class Inventory:
     def set_rain_barrel(self, value):
         """Set rain barrel status"""
         self.items['rain_barrel'] = value
+
+    def has_weather_tv(self):
+        """Check if weather TV is owned"""
+        return self.items['weather_tv']
+
+    def set_weather_tv(self, value):
+        """Set weather TV status"""
+        self.items['weather_tv'] = value
 
     def get_active_tool(self):
         """Get currently active tool"""

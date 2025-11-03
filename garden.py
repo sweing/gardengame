@@ -15,6 +15,7 @@ from weed_picker import WeedPicker
 from duck import Duck
 from storage_house import StorageHouse
 from rain_barrel import RainBarrel
+from weather_tv import WeatherTV
 from config import (
     INITIAL_CREDITS, GARDEN_ROWS, GARDEN_COLS,
     GARDEN_START_X, GARDEN_START_Y, GARDEN_SPACING_X, GARDEN_SPACING_Y,
@@ -63,6 +64,9 @@ class Garden:
 
         # Rain barrel system
         self.last_rain_barrel_collection = time.time()
+
+        # Weather TV (positioned bottom-left)
+        self.weather_tv = WeatherTV()
 
         # Initialize garden plots
         self._initialize_plots()
@@ -125,6 +129,10 @@ class Garden:
 
         # Update rain barrel collection
         self._update_rain_barrel()
+
+        # Update weather TV
+        if self.inventory.has_weather_tv():
+            self.weather_tv.update()
 
     def update_hover(self, mouse_pos):
         """Update hover state"""
@@ -381,6 +389,11 @@ class Garden:
         # Draw rain barrel if owned
         if self.inventory.has_rain_barrel():
             self.rain_barrel_visual.draw(screen)
+
+        # Draw weather TV if owned
+        if self.inventory.has_weather_tv():
+            forecast = self.weather.get_forecast(3)
+            self.weather_tv.draw(screen, font, forecast)
 
         # Draw credits
         credits_text = font.render(f"Credits: {self.credits}", True, BLACK)

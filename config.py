@@ -42,6 +42,7 @@ SHOP_PRICES = {
     'weed_picker': 10,
     'duck': 15,
     'rain_barrel': 10,
+    'weather_tv': 20,
     'fertilizer': 10,
     'water': 1
 }
@@ -68,6 +69,12 @@ SPRINKLER_THRESHOLD = 0.8
 
 # Rain barrel settings
 RAIN_BARREL_COLLECTION_INTERVAL = 10.0  # Collect water every 10 seconds during rain
+
+# Weather TV settings
+WEATHER_TV_X = 20
+WEATHER_TV_Y = 400
+WEATHER_TV_WIDTH = 120
+WEATHER_TV_HEIGHT = 80
 
 # Weed settings
 WEED_CHECK_INTERVAL = 5.0
@@ -200,6 +207,7 @@ SHOP_ITEMS = [
     ('Auberginen-Samen', 'eggplant_seeds', 20),
     ('Sprinkleranlage', 'sprinkler_system', 100),
     ('Regentonne', 'rain_barrel', 10),
+    ('Wetter-TV 📺', 'weather_tv', 20),
     ('Unkrautkiller', 'weed_killer', 25),
     ('Unkrautpflücker (2min)', 'weed_picker', 10),
     ('Ente 🦆 (2min)', 'duck', 15),
