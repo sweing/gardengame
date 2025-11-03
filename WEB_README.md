@@ -37,11 +37,16 @@ Dies erstellt:
 ```bash
 npm run serve
 ```
+Startet automatisch den Server auf Port 8000 und beendet alte Instanzen.
 
-### Option 2: Mit Python direkt
+### Option 2: Mit Python direkt (Alternative)
 ```bash
 cd build/web
 python -m http.server 8000
+```
+Wenn du bereits einen Server auf Port 8000 laufen hast, beende ihn zuerst:
+```bash
+pkill -f 'python -m http.server 8000'
 ```
 
 ### Zugriff
@@ -49,6 +54,8 @@ python -m http.server 8000
 ```
 http://localhost:8000
 ```
+
+**Hinweis:** Das Spiel benötigt einen HTTP-Server, da Browser lokale Dateien mit CORS-Einschränkungen versehen.
 
 ## Spielanleitung
 Das Spiel ist identisch zur Desktop-Version:

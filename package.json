@@ -6,7 +6,7 @@
   "scripts": {
     "build": "source venv/bin/activate && pygbag main.py",
     "dev": "source venv/bin/activate && pygbag main.py && cd build/web && python -m http.server 8000",
-    "serve": "pkill -f 'python -m http.server' || true && cd build/web && python -m http.server 8000",
+    "serve": "pkill -f 'python -m http.server 8000' 2>/dev/null || true; sleep 1 && cd build/web && python -m http.server 8000",
     "clean": "rm -rf build/"
   },
   "devDependencies": {
