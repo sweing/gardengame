@@ -130,7 +130,7 @@ SOUND_FILES = {
     'birds': 'sounds/birds.ogg'
 }
 
-BACKGROUND_MUSIC = 'sounds/forest_of_hope.mp3'
+BACKGROUND_MUSIC = 'sounds/bgm.ogg'
 DEFAULT_VOLUME = 0.7
 MUSIC_VOLUME_MULTIPLIER = 0.5
 AMBIENT_VOLUME_MULTIPLIER = 0.3

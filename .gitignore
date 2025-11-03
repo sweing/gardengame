@@ -42,3 +42,6 @@ build/web/
 
 # Logs
 *.log
+
+# Original sound files
+sounds/originals/
