@@ -52,11 +52,17 @@ class Shop:
         if item == 'sprinkler_system' and inventory.has_sprinkler():
             return "Sprinkleranlage bereits gekauft!", credits
 
+        # Check if rain barrel already owned
+        if item == 'rain_barrel' and inventory.has_rain_barrel():
+            return "Regentonne bereits gekauft!", credits
+
         # Check if enough credits
         if credits >= price:
             credits -= price
             if item == 'sprinkler_system':
                 inventory.set_sprinkler(True)
+            elif item == 'rain_barrel':
+                inventory.set_rain_barrel(True)
             elif item == 'weed_picker' or item == 'duck':
                 # Weed picker and duck are used immediately, not stored in inventory
                 pass
@@ -103,6 +109,11 @@ class Shop:
                 color = GRAY
                 display_name += " (Gekauft)"
 
+            # Gray out rain barrel if already owned
+            if item_key == 'rain_barrel' and inventory.has_rain_barrel():
+                color = GRAY
+                display_name += " (Gekauft)"
+
             button_rect = pygame.Rect(SHOP_X + 10, y_offset, SHOP_WIDTH - 20, SHOP_ITEM_HEIGHT)
             pygame.draw.rect(screen, color, button_rect)
             pygame.draw.rect(screen, BLACK, button_rect, 1)
@@ -111,7 +122,7 @@ class Shop:
             screen.blit(item_text, (SHOP_X + 15, y_offset + 5))
 
             # Show inventory count
-            if item_key != 'sprinkler_system':
+            if item_key != 'sprinkler_system' and item_key != 'rain_barrel':
                 count = inventory.get_item_count(item_key)
                 if count > 0:
                     count_text = font.render(f"({count})", True, BLACK)
@@ -120,9 +131,16 @@ class Shop:
             y_offset += SHOP_ITEM_SPACING
 
         # Show sprinkler status
+        status_y = SHOP_Y + SHOP_HEIGHT - 50
         if inventory.has_sprinkler():
             sprinkler_text = font.render("Sprinkler aktiv!", True, GREEN)
-            screen.blit(sprinkler_text, (SHOP_X + 65, SHOP_Y + SHOP_HEIGHT - 30))
+            screen.blit(sprinkler_text, (SHOP_X + 65, status_y))
+            status_y += 20
+
+        # Show rain barrel status
+        if inventory.has_rain_barrel():
+            barrel_text = font.render("Regentonne aktiv!", True, GREEN)
+            screen.blit(barrel_text, (SHOP_X + 65, status_y))
 
     def draw_button(self, screen, font):
         """Draw the shop toggle button"""

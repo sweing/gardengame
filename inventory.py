@@ -17,6 +17,7 @@ class Inventory:
             'carrot_seeds': 0,
             'eggplant_seeds': 0,
             'sprinkler_system': False,
+            'rain_barrel': False,
             'weed_killer': 0,
             'fertilizer': 0,
             'water': 0
@@ -51,6 +52,14 @@ class Inventory:
     def set_sprinkler(self, value):
         """Set sprinkler system status"""
         self.items['sprinkler_system'] = value
+
+    def has_rain_barrel(self):
+        """Check if rain barrel is owned"""
+        return self.items['rain_barrel']
+
+    def set_rain_barrel(self, value):
+        """Set rain barrel status"""
+        self.items['rain_barrel'] = value
 
     def get_active_tool(self):
         """Get currently active tool"""

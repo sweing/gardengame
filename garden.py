@@ -14,6 +14,7 @@ from snail import Snail
 from weed_picker import WeedPicker
 from duck import Duck
 from storage_house import StorageHouse
+from rain_barrel import RainBarrel
 from config import (
     INITIAL_CREDITS, GARDEN_ROWS, GARDEN_COLS,
     GARDEN_START_X, GARDEN_START_Y, GARDEN_SPACING_X, GARDEN_SPACING_Y,
@@ -56,6 +57,12 @@ class Garden:
 
         # Storage house (positioned in top-left area)
         self.storage_house = StorageHouse(20, 100)
+
+        # Rain barrel (positioned next to storage house)
+        self.rain_barrel_visual = RainBarrel(110, 150)
+
+        # Rain barrel system
+        self.last_rain_barrel_collection = time.time()
 
         # Initialize garden plots
         self._initialize_plots()
@@ -111,6 +118,13 @@ class Garden:
 
         # Update storage house
         self.storage_house.update()
+
+        # Update rain barrel visual
+        if self.inventory.has_rain_barrel():
+            self.rain_barrel_visual.update(current_weather)
+
+        # Update rain barrel collection
+        self._update_rain_barrel()
 
     def update_hover(self, mouse_pos):
         """Update hover state"""
@@ -308,6 +322,24 @@ class Garden:
                 # Duck's time is up
                 self.ducks.remove(duck)
 
+    def _update_rain_barrel(self):
+        """Collect water in rain barrel during rain"""
+        if not self.inventory.has_rain_barrel():
+            return
+
+        current_weather = self.weather.get_weather()
+        if current_weather != 'rainy':
+            return
+
+        current_time = time.time()
+        from config import RAIN_BARREL_COLLECTION_INTERVAL
+
+        if current_time - self.last_rain_barrel_collection >= RAIN_BARREL_COLLECTION_INTERVAL:
+            # Collect 1 water
+            self.inventory.add_item('water', 1)
+            self.last_rain_barrel_collection = current_time
+            # Optional: Could add a visual effect or sound here
+
     def _default_action(self, vegetable):
         """Perform default action on vegetable plot (no tool selected)"""
         # Priority 1: Remove weeds
@@ -345,6 +377,10 @@ class Garden:
 
         # Draw storage house (before other UI elements)
         self.storage_house.draw(screen)
+
+        # Draw rain barrel if owned
+        if self.inventory.has_rain_barrel():
+            self.rain_barrel_visual.draw(screen)
 
         # Draw credits
         credits_text = font.render(f"Credits: {self.credits}", True, BLACK)

@@ -41,6 +41,7 @@ SHOP_PRICES = {
     'weed_killer': 25,
     'weed_picker': 10,
     'duck': 15,
+    'rain_barrel': 10,
     'fertilizer': 10,
     'water': 1
 }
@@ -64,6 +65,9 @@ WATER_INCREASE_AMOUNT = 0.4
 SPRINKLER_WATER_INCREASE = 0.3
 SPRINKLER_INTERVAL = 10.0
 SPRINKLER_THRESHOLD = 0.8
+
+# Rain barrel settings
+RAIN_BARREL_COLLECTION_INTERVAL = 10.0  # Collect water every 10 seconds during rain
 
 # Weed settings
 WEED_CHECK_INTERVAL = 5.0
@@ -182,12 +186,12 @@ INVENTORY_BUTTON_WIDTH = 85
 INVENTORY_BUTTON_HEIGHT = 40
 
 # Shop UI
-SHOP_X = 200
-SHOP_Y = 200
-SHOP_WIDTH = 400
-SHOP_HEIGHT = 300
+SHOP_X = 150
+SHOP_Y = 150
+SHOP_WIDTH = 500
+SHOP_HEIGHT = 400
 SHOP_ITEM_HEIGHT = 25
-SHOP_ITEM_START_Y = 240
+SHOP_ITEM_START_Y = 190
 SHOP_ITEM_SPACING = 30
 
 SHOP_ITEMS = [
@@ -195,6 +199,7 @@ SHOP_ITEMS = [
     ('Karotten-Samen', 'carrot_seeds', 10),
     ('Auberginen-Samen', 'eggplant_seeds', 20),
     ('Sprinkleranlage', 'sprinkler_system', 100),
+    ('Regentonne', 'rain_barrel', 10),
     ('Unkrautkiller', 'weed_killer', 25),
     ('Unkrautpflücker (2min)', 'weed_picker', 10),
     ('Ente 🦆 (2min)', 'duck', 15),
